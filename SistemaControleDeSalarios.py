@@ -5,6 +5,26 @@ outSourcedCompanies = []
 amountOfOutSourcedEmployees = 0
 valeTransportes = []
 
+from enum import Enum
+
+class Cargo(Enum):
+    DIRETOR = 1
+    COORDENADOR = 2
+    RECURSOS_HUMANOS = 3
+    MARKETING = 4
+    VENDAS = 5
+    FINANCEIRO = 6
+    DESENVOLVEDOR = 7
+    PRODUCT_DESIGNER = 8
+    LIMPEZA = 9
+
+    @staticmethod
+    def obter_nome_por_valor(valor):
+        for cargo in Cargo:
+            if cargo.value == valor:
+                return cargo.name.replace("_", " ").title()
+        return "Cargo inválido" 
+
 def CalcularHoraExtra(extraHours):
     valorHoraNormal = 15.0
     valorHoraExtra = valorHoraNormal * 1.5
@@ -28,9 +48,9 @@ def InserirFuncionariosPredefinidos():
         nome = f"Funcionário {i+1}"
         cargo = random.choice(cargos)
         salario_base = random.randint(1500, 5000)  # Salário entre 1500 e 5000
-        vale_alimentacao = round(random.uniform(100, 500), 2)  # Vale alimentação entre 100 e 500
-        vale_transporte = round(random.uniform(50, 300), 2)  # Vale transporte entre 50 e 300
-        comissao = round(random.uniform(100, 500), 2)  # Comissão entre 100 e 500
+        vale_alimentacao = round(random.uniform(0, 500), 2)  # Vale alimentação entre 100 e 500
+        vale_transporte = round(random.uniform(0, 300), 2)  # Vale transporte entre 50 e 300
+        comissao = round(random.uniform(0, 100), 2)  # Comissão entre 100 e 500
         horas_extra = round(random.uniform(0, 50), 2)  # Horas extras entre 0 e 50 horas
         terceirizado = random.choice([True, False])  # 50% chance de ser terceirizado
         empresa_terceira = random.choice(["TechSol", "ConexãoCorp", "MarketingPro", "DevWorks", "CleanCorp"]) if terceirizado else None
@@ -76,6 +96,7 @@ def CadastrarSalario():
     "7- Desenvolvedor \n" \
     "8- Product Designer \n" \
     "9- Limpeza \n" ))
+    cargo_nome = Cargo.obter_nome_por_valor(role)
     baseSalary = float(input("Salário: R$ "))
     baseSalaries.append(baseSalary)
     valeAlimentacao = float(input("Vale alimentação: R$ "))
@@ -104,7 +125,7 @@ def CadastrarSalario():
     amountOfEmployees += 1
     print(f"\nResumo do cadastro:")
     print(f"Nome: {name}")
-    print(f"Cargo: {role}")
+    print(f"Cargo: {cargo_nome}")
     print(f"Salário base: R$ {baseSalary:.2f}")
     totalSalary = CalcularSalario(baseSalary, transportCost, valeAlimentacao, comission, totalHorasExtra)
     print(f"Salário total: R$ {totalSalary:.2f}")
@@ -114,7 +135,7 @@ def CadastrarSalario():
 
     funcionario = {
     "nome": name,
-    "cargo": role,
+    "cargo": cargo_nome,
     "salario_base": baseSalary,
     "vale_alimentacao": valeAlimentacao,
     "vale_transporte": transportCost,
@@ -198,15 +219,38 @@ def GerarGraficos():
     plt.legend()
     plt.show()
 
+def gerarArquivoCsv():
+    import csv
+
+    global registrosFuncionarios
+
+    if not registrosFuncionarios:
+        print("Nenhum funcionário cadastrado para gerar o CSV.")
+        return
+
+    with open('funcionarios.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Nome', 'Cargo', 'Salário Base', 'Vale Alimentação', 'Vale Transporte', 'Comissão', 'Horas Extras', 'Salário Total', 'Terceirizado', 'Empresa Terceira'])
+        
+        for funcionario in registrosFuncionarios:
+            writer.writerow([
+                funcionario['nome'],
+                funcionario['cargo'],
+                funcionario['salario_base'],
+                funcionario['vale_alimentacao'],
+            ])
+
 def main():
     while True:
         try:
             menu = int(input("======= MENU INICIAL =======\n" \
                 "1- Cadastrar salário \n"\
-                "2- Gerar tabela\n" \
-                "3- Informaçãoes gerais \n"
+                "2- Dados gerais\n" \
+                "3- Gerar gráficos \n"
                 "4- Dados pré-definidos \n" \
-                "5- Sair\n"))
+                "5- Gerar CSV\n" \
+                "6- Sair \n" \
+                "Escolha uma opção (1-6): "))       
 
             if menu == 1:
                 CadastrarSalario()
@@ -215,8 +259,13 @@ def main():
             elif menu == 3:
                 GerarGraficos()
             elif menu == 4:
-                InserirFuncionariosPredefinidos()                
+                InserirFuncionariosPredefinidos()      
             elif menu == 5:
+                gerarCSV = input("Deseja gerar um arquivo CSV com os dados? (s/n): ").strip().lower()
+                if gerarCSV == 's': 
+                    gerarArquivoCsv()   
+                    print("Arquivo 'funcionarios.csv' salvo com sucesso.")       
+            elif menu == 6:
                 print("Saindo...")
                 break
             else:
