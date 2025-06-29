@@ -34,50 +34,6 @@ def CalcularHoraExtra(extraHours):
 def CalcularSalario(baseSalary, transportationCost, valeAlimentacao, comission, horasExtra):
     return baseSalary + transportationCost + comission + horasExtra + valeAlimentacao
 
-import random
-
-def InserirFuncionariosPredefinidos():
-    funcionarios = []
-    cargos = [
-        "Diretor", "Coordenador", "Recursos Humanos", "Marketing", "Vendas",
-        "Financeiro", "Desenvolvedor", "Product Designer", "Limpeza"
-    ]
-    
-    # Gerando 50 funcionários com dados variados
-    for i in range(50):
-        nome = f"Funcionário {i+1}"
-        cargo = random.choice(cargos)
-        salario_base = random.randint(1500, 5000)  # Salário entre 1500 e 5000
-        vale_alimentacao = round(random.uniform(0, 500), 2)  # Vale alimentação entre 100 e 500
-        vale_transporte = round(random.uniform(0, 300), 2)  # Vale transporte entre 50 e 300
-        comissao = round(random.uniform(0, 100), 2)  # Comissão entre 100 e 500
-        horas_extra = round(random.uniform(0, 50), 2)  # Horas extras entre 0 e 50 horas
-        terceirizado = random.choice([True, False])  # 50% chance de ser terceirizado
-        empresa_terceira = random.choice(["TechSol", "ConexãoCorp", "MarketingPro", "DevWorks", "CleanCorp"]) if terceirizado else None
-
-        # Calcular salário total
-        salario_total = salario_base + vale_alimentacao + vale_transporte + comissao + (horas_extra * 15)  # Hora extra a R$ 15
-
-        funcionario = {
-            "nome": nome,
-            "cargo": cargo,
-            "salario_base": salario_base,
-            "vale_alimentacao": vale_alimentacao,
-            "vale_transporte": vale_transporte,
-            "comissao": comissao,
-            "horas_extra": horas_extra,
-            "salario_total": salario_total,
-            "terceirizado": terceirizado,
-            "empresa_terceira": empresa_terceira
-        }
-        
-        funcionarios.append(funcionario)
-    
-    # Adicionando os funcionários na lista global de registros
-    registrosFuncionarios.extend(funcionarios)
-    
-    print(f"{len(funcionarios)} funcionários predefinidos cadastrados com sucesso.")
-
 def CadastrarSalario():
     global registrosFuncionarios
     global baseSalaries
@@ -181,7 +137,6 @@ def GerarGraficos():
         print("Nenhum funcionário cadastrado para gerar gráficos.")
         return
 
-    # Gráfico de salários
     nomes = [funcionario['nome'] for funcionario in registrosFuncionarios]
     salarios = [funcionario['salario_total'] for funcionario in registrosFuncionarios]
 
@@ -247,25 +202,22 @@ def main():
                 "1- Cadastrar salário \n"\
                 "2- Dados gerais\n" \
                 "3- Gerar gráficos \n"
-                "4- Dados pré-definidos \n" \
-                "5- Gerar CSV\n" \
-                "6- Sair \n" \
-                "Escolha uma opção (1-6): "))       
+                "4- Gerar CSV\n" \
+                "5- Sair \n" \
+                "Escolha uma opção (1-5): "))       
 
             if menu == 1:
                 CadastrarSalario()
             elif menu == 2:
                 GeneralInfo()
             elif menu == 3:
-                GerarGraficos()
+                GerarGraficos()   
             elif menu == 4:
-                InserirFuncionariosPredefinidos()      
-            elif menu == 5:
                 gerarCSV = input("Deseja gerar um arquivo CSV com os dados? (s/n): ").strip().lower()
                 if gerarCSV == 's': 
                     gerarArquivoCsv()   
                     print("Arquivo 'funcionarios.csv' salvo com sucesso.")       
-            elif menu == 6:
+            elif menu == 5:
                 print("Saindo...")
                 break
             else:
